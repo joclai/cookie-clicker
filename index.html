@@ -1,171 +1,625 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="system">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🍪 Jarvis Clicker</title>
     <style>
+        /* =========== THEME VARIABLES =========== */
+        :root {
+            --bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            --container-bg: rgba(255,255,255,0.05);
+            --container-border: rgba(255,255,255,0.1);
+            --text: #fff;
+            --text-secondary: rgba(255,255,255,0.5);
+            --text-tertiary: rgba(255,255,255,0.3);
+            --upgrade-bg: rgba(255,255,255,0.05);
+            --upgrade-border: transparent;
+            --upgrade-hover-bg: rgba(255,255,255,0.08);
+            --upgrade-hover-border: rgba(255,255,255,0.1);
+            --shadow: 0 25px 50px rgba(0,0,0,0.5);
+            --btn-bg: linear-gradient(45deg, #667eea, #764ba2);
+            --btn-diabled-bg: linear-gradient(45deg, #555, #444);
+            --reset-btn-border: rgba(255,255,255,0.2);
+            --reset-btn-text: rgba(255,255,255,0.4);
+            --shop-border: rgba(255,255,255,0.1);
+            --h1-gradient: linear-gradient(45deg, #f093fb, #f5576c);
+            --count-gradient: linear-gradient(45deg, #f6d365, #fda085);
+        }
+
+        [data-theme="light"] {
+            --bg: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --container-bg: rgba(255,255,255,0.7);
+            --container-border: rgba(0,0,0,0.1);
+            --text: #2d3436;
+            --text-secondary: rgba(0,0,0,0.5);
+            --text-tertiary: rgba(0,0,0,0.3);
+            --upgrade-bg: rgba(0,0,0,0.04);
+            --upgrade-border: transparent;
+            --upgrade-hover-bg: rgba(0,0,0,0.06);
+            --upgrade-hover-border: rgba(0,0,0,0.1);
+            --shadow: 0 25px 50px rgba(0,0,0,0.15);
+            --btn-bg: linear-gradient(45deg, #6c5ce7, #a29bfe);
+            --btn-diabled-bg: linear-gradient(45deg, #b2bec3, #dfe6e9);
+            --reset-btn-border: rgba(0,0,0,0.2);
+            --reset-btn-text: rgba(0,0,0,0.4);
+            --shop-border: rgba(0,0,0,0.1);
+            --h1-gradient: linear-gradient(45deg, #e17055, #d63031);
+            --count-gradient: linear-gradient(45deg, #fdcb6e, #e17055);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: var(--bg);
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            color: #fff;
+            align-items: flex-start;
+            padding: 20px;
+            color: var(--text);
+            transition: background 0.3s, color 0.3s;
         }
+
         .game-container {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--container-bg);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-radius: 24px;
             padding: 40px;
-            max-width: 600px;
-            width: 90%;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            max-width: 620px;
+            width: 100%;
+            border: 1px solid var(--container-border);
+            box-shadow: var(--shadow);
+            transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
         }
-        h1 {
-            text-align: center;
-            font-size: 2rem;
+
+        /* =========== HEADER =========== */
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
             margin-bottom: 8px;
-            background: linear-gradient(45deg, #f093fb, #f5576c);
+        }
+
+        .header-titles h1 {
+            font-size: 2rem;
+            background: var(--h1-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        .subtitle { text-align: center; color: rgba(255,255,255,0.5); margin-bottom: 24px; font-size: 0.9rem; }
-        .cookie-section { text-align: center; margin-bottom: 24px; }
+
+        .header-titles .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .theme-toggle {
+            background: var(--upgrade-bg);
+            border: 1px solid var(--container-border);
+            border-radius: 12px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            line-height: 1;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .theme-toggle:hover {
+            background: var(--upgrade-hover-bg);
+            transform: scale(1.05);
+        }
+
+        .cookie-section { text-align: center; margin: 24px 0; }
+
         #cookie {
             font-size: 120px; cursor: pointer; display: inline-block;
             transition: transform 0.1s; user-select: none;
             filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+            line-height: 1;
         }
         #cookie:active { transform: scale(0.9); }
         #cookie:hover { transform: scale(1.05); }
-        .stats { text-align: center; margin-bottom: 24px; }
-        #count { font-size: 3rem; font-weight: bold; background: linear-gradient(45deg, #f6d365, #fda085); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        #count-label { font-size: 1rem; color: rgba(255,255,255,0.6); }
-        #cps { font-size: 0.9rem; color: rgba(255,255,255,0.4); margin-top: 4px; }
-        .shop { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
-        .shop h2 { font-size: 1.2rem; margin-bottom: 16px; color: rgba(255,255,255,0.8); }
+
+        .stats { text-align: center; margin-bottom: 20px; }
+        #count { font-size: 2.8rem; font-weight: bold; background: var(--count-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        #count-label { font-size: 1rem; color: var(--text-secondary); }
+        #cps { font-size: 0.9rem; color: var(--text-tertiary); margin-top: 4px; }
+
+        /* =========== ACHIEVEMENTS =========== */
+        .achievement-banner {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-80px);
+            background: var(--container-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--container-border);
+            border-radius: 16px;
+            padding: 12px 24px;
+            box-shadow: var(--shadow);
+            z-index: 9999;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s;
+            opacity: 0;
+            pointer-events: none;
+            white-space: nowrap;
+            color: var(--text);
+        }
+
+        .achievement-banner.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .achievement-section {
+            margin-top: 12px;
+        }
+
+        .achievement-toggle {
+            background: none;
+            border: 1px solid var(--reset-btn-border);
+            color: var(--reset-btn-text);
+            padding: 4px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+        }
+
+        .achievement-toggle:hover {
+            border-color: var(--text-secondary);
+            color: var(--text-secondary);
+        }
+
+        .achievement-list {
+            display: none;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .achievement-list.open { display: flex; }
+
+        .achievement-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            background: var(--upgrade-bg);
+            border: 1px solid var(--upgrade-border);
+            transition: all 0.2s;
+        }
+
+        .achievement-badge.locked {
+            opacity: 0.3;
+            filter: grayscale(1);
+        }
+
+        /* =========== SHOP =========== */
+        .shop { border-top: 1px solid var(--shop-border); padding-top: 20px; margin-top: 8px; }
+        .shop-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .shop h2 { font-size: 1.2rem; color: var(--text); }
+        .total-cookies-display { font-size: 0.8rem; color: var(--text-tertiary); }
+
         .upgrade {
             display: flex; justify-content: space-between; align-items: center;
-            background: rgba(255,255,255,0.05); padding: 12px 16px; border-radius: 12px;
-            margin-bottom: 8px; transition: all 0.2s; border: 1px solid transparent;
+            background: var(--upgrade-bg); padding: 12px 16px; border-radius: 12px;
+            margin-bottom: 8px; transition: all 0.2s; border: 1px solid var(--upgrade-border);
         }
-        .upgrade:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.1); }
+        .upgrade:hover { background: var(--upgrade-hover-bg); border-color: var(--upgrade-hover-border); }
         .upgrade.disabled { opacity: 0.4; cursor: not-allowed; }
         .upgrade-info { flex: 1; }
-        .upgrade-name { font-weight: 600; font-size: 1rem; }
-        .upgrade-desc { font-size: 0.8rem; color: rgba(255,255,255,0.5); }
-        .upgrade-amount { font-size: 0.75rem; color: rgba(255,255,255,0.3); }
+        .upgrade-name { font-weight: 600; font-size: 1rem; color: var(--text); }
+        .upgrade-desc { font-size: 0.8rem; color: var(--text-secondary); }
+        .upgrade-amount { font-size: 0.75rem; color: var(--text-tertiary); }
         .upgrade-btn {
-            background: linear-gradient(45deg, #667eea, #764ba2); border: none; color: white;
+            background: var(--btn-bg); border: none; color: white;
             padding: 8px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;
-            font-size: 0.9rem; transition: transform 0.1s;
+            font-size: 0.9rem; transition: transform 0.1s; flex-shrink: 0;
         }
         .upgrade-btn:active { transform: scale(0.95); }
-        .upgrade.disabled .upgrade-btn { background: linear-gradient(45deg, #555, #444); cursor: not-allowed; }
+        .upgrade.disabled .upgrade-btn { background: var(--btn-diabled-bg); cursor: not-allowed; }
+
         .particle {
-            position: fixed; pointer-events: none; font-size: 24px;
+            position: fixed; pointer-events: none; font-size: 20px;
             animation: floatUp 1s ease-out forwards; z-index: 1000;
         }
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(0) scale(1); }
             100% { opacity: 0; transform: translateY(-100px) scale(0.5); }
         }
-        .reset-btn {
-            display: block; margin: 20px auto 0; background: none;
-            border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.4);
-            padding: 6px 16px; border-radius: 8px; cursor: pointer; font-size: 0.8rem;
-            transition: all 0.2s;
+
+        .footer-actions {
+            display: flex; justify-content: center; gap: 12px; margin-top: 20px;
         }
-        .reset-btn:hover { border-color: rgba(255,255,255,0.4); color: rgba(255,255,255,0.6); }
+        .footer-btn {
+            background: none; border: 1px solid var(--reset-btn-border);
+            color: var(--reset-btn-text); padding: 6px 16px; border-radius: 8px;
+            cursor: pointer; font-size: 0.8rem; transition: all 0.2s;
+        }
+        .footer-btn:hover { border-color: var(--text-secondary); color: var(--text-secondary); }
+
+        @media (max-width: 500px) {
+            .game-container { padding: 24px; }
+            #cookie { font-size: 80px; }
+            #count { font-size: 2rem; }
+            .header-titles h1 { font-size: 1.5rem; }
+        }
     </style>
 </head>
 <body>
+    <div id="achievementBanner" class="achievement-banner">🏆 Achievement débloqué !</div>
+
     <div class="game-container">
-        <h1>🍪 Jarvis Clicker</h1>
-        <p class="subtitle">Clique sur le cookie, deviens riche. Simple.</p>
+        <!-- Header -->
+        <div class="header-row">
+            <div class="header-titles">
+                <h1>🍪 Jarvis Clicker</h1>
+                <div class="subtitle">Clique sur le cookie, deviens riche. Simple.</div>
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="Changer le thème">🌙</button>
+        </div>
+
+        <!-- Cookie -->
         <div class="cookie-section"><div id="cookie">🍪</div></div>
+
+        <!-- Stats -->
         <div class="stats">
             <div><span id="count">0</span> <span id="count-label">cookies</span></div>
             <div id="cps">par seconde: 0</div>
         </div>
+
+        <!-- Achievements (collapsed) -->
+        <div class="achievement-section">
+            <button class="achievement-toggle" onclick="toggleAchievements()">🏆 Succès <span id="achCount">0/0</span></button>
+            <div class="achievement-list" id="achievementList"></div>
+        </div>
+
+        <!-- Shop -->
         <div class="shop">
-            <h2>🏪 Améliorations</h2>
+            <div class="shop-header">
+                <h2>🏪 Améliorations</h2>
+                <span class="total-cookies-display" id="totalCookiesLabel">total: 0</span>
+            </div>
             <div id="upgrades"></div>
         </div>
-        <button class="reset-btn" onclick="resetGame()">🔄 Recommencer</button>
+
+        <!-- Footer -->
+        <div class="footer-actions">
+            <button class="footer-btn" onclick="resetGame()">🔄 Recommencer</button>
+            <button class="footer-btn" onclick="exportSave()">💾 Exporter</button>
+            <button class="footer-btn" onclick="document.getElementById('importInput').click()">📥 Importer</button>
+            <input type="file" id="importInput" accept=".json" style="display:none" onchange="importSave(event)">
+        </div>
     </div>
+
     <script>
-        const UPGRADES = [
-            { id: 'click', name: '👆 Click+', desc: '+1 par clic', baseCost: 15, costMult: 1.15, effect: 'click', power: 1 },
-            { id: 'cursor', name: '🖱️ Curseur', desc: 'Auto-clic automatique', baseCost: 100, costMult: 1.2, effect: 'cps', power: 1 },
-            { id: 'grandma', name: '👵 Mamie', desc: 'Ferme des cookies', baseCost: 500, costMult: 1.25, effect: 'cps', power: 5 },
-            { id: 'factory', name: '🏭 Usine', desc: 'Production de masse', baseCost: 3000, costMult: 1.3, effect: 'cps', power: 20 },
-            { id: 'mine', name: '⛏️ Mine', desc: 'Minage de cookies', baseCost: 10000, costMult: 1.35, effect: 'cps', power: 100 },
-            { id: 'portal', name: '🌀 Portail', desc: 'Cookies dimensionnels', baseCost: 50000, costMult: 1.4, effect: 'cps', power: 500 },
+        // ==================== THEME ====================
+        function getSystemTheme() {
+            return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        }
+
+        function applyTheme(theme) {
+            const html = document.documentElement;
+            const btn = document.getElementById('themeBtn');
+            if (theme === 'system') {
+                const sys = getSystemTheme();
+                html.setAttribute('data-theme', sys);
+                btn.textContent = sys === 'dark' ? '🌙' : '☀️';
+                btn.title = `Thème système (${sys}) — Clique pour basculer`;
+            } else {
+                html.setAttribute('data-theme', theme);
+                btn.textContent = theme === 'dark' ? '🌙' : '☀️';
+                btn.title = `Thème ${theme} — Clique pour basculer`;
+            }
+        }
+
+        let themeState = 'system'; // 'system' | 'dark' | 'light'
+
+        function toggleTheme() {
+            if (themeState === 'system') themeState = 'dark';
+            else if (themeState === 'dark') themeState = 'light';
+            else themeState = 'system';
+            localStorage.setItem('jarvisTheme', themeState);
+            applyTheme(themeState);
+        }
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
+            if (themeState === 'system') applyTheme('system');
+        });
+
+        // ==================== ACHIEVEMENTS ====================
+        const ACHIEVEMENTS = [
+            { id: 'first_click', name: 'Premier clic', desc: 'Clique une fois', check: s => s.totalCookies >= 1 },
+            { id: 'hundred', name: 'Centenaire', desc: 'Atteins 100 cookies', check: s => s.totalCookies >= 100 },
+            { id: 'thousand', name: 'Mille', desc: 'Atteins 1 000 cookies', check: s => s.totalCookies >= 1000 },
+            { id: 'million', name: 'Milliardaire en herbe', desc: 'Atteins 1 000 000 cookies', check: s => s.totalCookies >= 1_000_000 },
+            { id: 'billion', name: '🍪 Billion', desc: 'Atteins 1 000 000 000 cookies', check: s => s.totalCookies >= 1_000_000_000 },
+            { id: 'click_master', name: 'Click master', desc: 'Achète 10 Click+', check: s => (s.upgrades.click || 0) >= 10 },
+            { id: 'grandma_army', name: 'Armée de mamies', desc: 'Achète 25 Mamies', check: s => (s.upgrades.grandma || 0) >= 25 },
+            { id: 'factory_owner', name: 'Propriétaire d\'usine', desc: 'Achète 10 Usines', check: s => (s.upgrades.factory || 0) >= 10 },
+            { id: 'portal_master', name: 'Portail dimensionnel', desc: 'Achète 5 Portails', check: s => (s.upgrades.portal || 0) >= 5 },
+            { id: 'time_traveler', name: 'Voyageur temporel', desc: 'Achète 1 Machine à remonter le temps', check: s => (s.upgrades.time_machine || 0) >= 1 },
+            { id: '100cps', name: 'Automatisé', desc: 'Produis 100 cookies/s', check: s => s.cps >= 100 },
+            { id: '100kcps', name: 'Industrie lourde', desc: 'Produis 100 000 cookies/s', check: s => s.cps >= 100_000 },
+            { id: 'mega_cps', name: '🐉 Puissance divine', desc: 'Produis 10 000 000 cookies/s', check: s => s.cps >= 10_000_000 },
+            { id: 'all_upgrades', name: 'Complétiste', desc: 'Achète au moins 1 de chaque amélioration', check: s => UPGRADES.every(u => (s.upgrades[u.id] || 0) >= 1) },
+            { id: 'portal_crazy', name: '🌀 Portail en folie', desc: 'Achète 50 Portails', check: s => (s.upgrades.portal || 0) >= 50 },
         ];
+
+        let unlockedAchievements = new Set();
+
+        function checkAchievements() {
+            ACHIEVEMENTS.forEach(a => {
+                if (unlockedAchievements.has(a.id)) return;
+                if (a.check(state)) {
+                    unlockedAchievements.add(a.id);
+                    showAchievementBanner(a.name);
+                    saveAchievements();
+                }
+            });
+            renderAchievements();
+        }
+
+        function showAchievementBanner(name) {
+            const banner = document.getElementById('achievementBanner');
+            banner.textContent = '🏆 Succès débloqué : ' + name;
+            banner.classList.add('show');
+            setTimeout(() => banner.classList.remove('show'), 3500);
+        }
+
+        function renderAchievements() {
+            const list = document.getElementById('achievementList');
+            const count = document.getElementById('achCount');
+            const unlocked = ACHIEVEMENTS.filter(a => unlockedAchievements.has(a.id)).length;
+            count.textContent = unlocked + '/' + ACHIEVEMENTS.length;
+            list.innerHTML = '';
+            ACHIEVEMENTS.forEach(a => {
+                const badge = document.createElement('span');
+                badge.className = 'achievement-badge' + (unlockedAchievements.has(a.id) ? '' : ' locked');
+                badge.textContent = (unlockedAchievements.has(a.id) ? '' : '🔒') + ' ' + a.name;
+                badge.title = a.desc;
+                list.appendChild(badge);
+            });
+        }
+
+        let achievementsOpen = false;
+        function toggleAchievements() {
+            achievementsOpen = !achievementsOpen;
+            document.getElementById('achievementList').classList.toggle('open', achievementsOpen);
+        }
+
+        function loadAchievements() {
+            try {
+                const saved = localStorage.getItem('jarvisAchievements');
+                if (saved) {
+                    const arr = JSON.parse(saved);
+                    arr.forEach(id => unlockedAchievements.add(id));
+                }
+            } catch(e) {}
+            renderAchievements();
+        }
+
+        function saveAchievements() {
+            localStorage.setItem('jarvisAchievements', JSON.stringify([...unlockedAchievements]));
+        }
+
+        // ==================== GAME DATA ====================
+        const UPGRADES = [
+            // Early game
+            { id: 'click',      name: '👆 Click+',     desc: '+1 par clic',            baseCost: 15,     costMult: 1.15, effect: 'click', power: 1 },
+            { id: 'cursor',     name: '🖱️ Curseur',    desc: 'Auto-clic automatique',   baseCost: 100,    costMult: 1.20, effect: 'cps',   power: 1 },
+            { id: 'grandma',    name: '👵 Mamie',      desc: 'Ferme des cookies',       baseCost: 500,    costMult: 1.25, effect: 'cps',   power: 5 },
+            { id: 'factory',    name: '🏭 Usine',      desc: 'Production de masse',     baseCost: 3000,   costMult: 1.30, effect: 'cps',   power: 20 },
+            { id: 'mine',       name: '⛏️ Mine',       desc: 'Minage de cookies',       baseCost: 10000,  costMult: 1.35, effect: 'cps',   power: 100 },
+            { id: 'portal',     name: '🌀 Portail',    desc: 'Cookies dimensionnels',   baseCost: 50000,  costMult: 1.40, effect: 'cps',   power: 500 },
+            // Late game - cheated
+            { id: 'time_machine',name: '⏰ Machine à remonter le temps', desc: 'Rapporte des cookies du futur', baseCost: 200000, costMult: 1.45, effect: 'cps', power: 3000 },
+            { id: 'antimatter', name: '⚛️ Condensateur d\'antimatière',  desc: 'Annihilation matière/cookies', baseCost: 1_000_000, costMult: 1.50, effect: 'cps', power: 15000 },
+            { id: 'dyson',      name: '🌌 Sphère de Dyson',             desc: 'Énergie stellaire en cookies',  baseCost: 10_000_000, costMult: 1.55, effect: 'cps', power: 100_000 },
+            { id: 'ai_override',name: '🧠 IA Surchargée',               desc: 'Optimise tout, partout',       baseCost: 100_000_000, costMult: 1.60, effect: 'cps', power: 1_000_000 },
+            { id: 'universe',   name: '🌠 Redémarrage d\'univers',     desc: 'Le big crunch en cookies',     baseCost: 1_000_000_000, costMult: 1.65, effect: 'cps', power: 10_000_000 },
+            { id: 'jarvis_secret', name: '🤖 Jarvis Mode',             desc: 'Mes algorithmes secrets',      baseCost: 100_000_000_000, costMult: 1.70, effect: 'cps', power: 1_000_000_000 },
+        ];
+
         let state = { cookies: 0, totalCookies: 0, clickPower: 1, cps: 0, upgrades: {} };
         UPGRADES.forEach(u => state.upgrades[u.id] = 0);
+
+        // ==================== SAVE / LOAD ====================
+        function buildSaveData() {
+            return {
+                cookies: state.cookies,
+                totalCookies: state.totalCookies,
+                clickPower: state.clickPower,
+                cps: state.cps,
+                upgrades: state.upgrades,
+                achievements: [...unlockedAchievements],
+                theme: themeState,
+                achievementsOpen: achievementsOpen,
+            };
+        }
+
         function loadGame() {
+            // Theme
+            const savedTheme = localStorage.getItem('jarvisTheme');
+            if (savedTheme) themeState = savedTheme;
+            applyTheme(themeState);
+
+            // Achievements
+            loadAchievements();
+
+            // Game state
             try {
                 const saved = localStorage.getItem('jarvisClicker');
                 if (saved) {
                     const p = JSON.parse(saved);
-                    state.cookies = p.cookies || 0; state.totalCookies = p.totalCookies || 0;
-                    state.clickPower = p.clickPower || 1; state.cps = p.cps || 0;
+                    state.cookies = p.cookies || 0;
+                    state.totalCookies = p.totalCookies || 0;
+                    state.clickPower = p.clickPower || 1;
+                    state.cps = p.cps || 0;
                     if (p.upgrades) UPGRADES.forEach(u => { state.upgrades[u.id] = p.upgrades[u.id] || 0; });
                 }
             } catch(e) {}
         }
+
         function saveGame() {
             localStorage.setItem('jarvisClicker', JSON.stringify({
-                cookies: state.cookies, totalCookies: state.totalCookies,
-                clickPower: state.clickPower, cps: state.cps, upgrades: state.upgrades
+                cookies: state.cookies,
+                totalCookies: state.totalCookies,
+                clickPower: state.clickPower,
+                cps: state.cps,
+                upgrades: state.upgrades,
             }));
         }
+
+        // ==================== GAME LOGIC ====================
         function getCost(u) { return Math.floor(u.baseCost * Math.pow(u.costMult, state.upgrades[u.id])); }
+
         function createParticle(x, y, text) {
-            const p = document.createElement('div'); p.className = 'particle'; p.textContent = text;
-            p.style.left = x + 'px'; p.style.top = y + 'px';
-            document.body.appendChild(p); setTimeout(() => p.remove(), 1000);
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.textContent = text;
+            p.style.left = x + 'px';
+            p.style.top = y + 'px';
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 1000);
         }
+
         function clickCookie(e) {
-            state.cookies += state.clickPower; state.totalCookies += state.clickPower;
+            state.cookies += state.clickPower;
+            state.totalCookies += state.clickPower;
             const r = e.target.getBoundingClientRect();
-            createParticle(e.clientX-20+Math.random()*40, e.clientY-20+Math.random()*40, '+'+state.clickPower);
-            updateUI(); saveGame();
+            createParticle(e.clientX - 20 + Math.random() * 40, e.clientY - 20 + Math.random() * 40, '+' + state.clickPower);
+            updateUI();
+            saveGame();
+            checkAchievements();
         }
+
         function buyUpgrade(id) {
-            const u = UPGRADES.find(x => x.id === id); if (!u) return;
-            const cost = getCost(u); if (state.cookies < cost) return;
-            state.cookies -= cost; state.upgrades[u.id]++;
+            const u = UPGRADES.find(x => x.id === id);
+            if (!u) return;
+            const cost = getCost(u);
+            if (state.cookies < cost) return;
+            state.cookies -= cost;
+            state.upgrades[u.id]++;
             if (u.effect === 'click') state.clickPower += u.power;
             else if (u.effect === 'cps') state.cps += u.power;
-            updateUI(); saveGame();
+            updateUI();
+            saveGame();
+            checkAchievements();
         }
+
         function updateUI() {
             document.getElementById('count').textContent = Math.floor(state.cookies).toLocaleString();
             document.getElementById('cps').textContent = 'par seconde: ' + state.cps.toLocaleString();
-            const d = document.getElementById('upgrades'); d.innerHTML = '';
+            document.getElementById('totalCookiesLabel').textContent = 'total: ' + state.totalCookies.toLocaleString();
+
+            const d = document.getElementById('upgrades');
+            d.innerHTML = '';
+
             UPGRADES.forEach(u => {
-                const cost = getCost(u), canBuy = state.cookies >= cost, owned = state.upgrades[u.id];
+                const cost = getCost(u);
+                const canBuy = state.cookies >= cost;
+                const owned = state.upgrades[u.id] || 0;
+
                 const div = document.createElement('div');
                 div.className = 'upgrade' + (canBuy ? '' : ' disabled');
+
                 let extra = '';
-                if (u.effect === 'cps' && owned > 0) extra = '<div class="upgrade-amount">Produit: ' + (u.power * owned).toLocaleString() + ' cookies/s</div>';
-                else if (u.effect === 'click' && owned > 0) extra = '<div class="upgrade-amount">+' + (state.clickPower - 1) + ' par clic</div>';
-                div.innerHTML = '<div class="upgrade-info"><div class="upgrade-name">'+u.name+' <span style="font-size:0.8rem;color:rgba(255,255,255,0.3)">x'+owned+'</span></div><div class="upgrade-desc">'+u.desc+' — 🍪 '+cost.toLocaleString()+'</div>'+extra+'</div><button class="upgrade-btn" onclick="buyUpgrade(\''+u.id+'\')"'+(canBuy?'':' disabled')+'>Acheter</button>';
+                if (u.effect === 'cps' && owned > 0) {
+                    extra = '<div class="upgrade-amount">Produit: ' + (u.power * owned).toLocaleString() + ' cookies/s</div>';
+                } else if (u.effect === 'click' && owned > 0) {
+                    extra = '<div class="upgrade-amount">+' + (state.clickPower - 1) + ' par clic</div>';
+                }
+
+                div.innerHTML = '<div class="upgrade-info">'
+                    + '<div class="upgrade-name">' + u.name + ' <span style="font-size:0.8rem;opacity:0.3">x' + owned + '</span></div>'
+                    + '<div class="upgrade-desc">' + u.desc + ' — 🍪 ' + cost.toLocaleString() + '</div>'
+                    + extra
+                    + '</div>'
+                    + '<button class="upgrade-btn" onclick="buyUpgrade(\'' + u.id + '\')"'
+                    + (canBuy ? '' : ' disabled') + '>Acheter</button>';
+
                 d.appendChild(div);
             });
         }
-        function resetGame() { if (confirm('Tout recommencer à zéro ?')) { localStorage.removeItem('jarvisClicker'); location.reload(); } }
-        function gameLoop() { if (state.cps > 0) { state.cookies += state.cps / 10; state.totalCookies += state.cps / 10; updateUI(); saveGame(); } }
-        loadGame(); updateUI();
+
+        // ==================== MISC ====================
+        function resetGame() {
+            if (confirm('Tout recommencer à zéro ?\n(les succès acquis resteront)')) {
+                state.cookies = 0;
+                state.totalCookies = 0;
+                state.clickPower = 1;
+                state.cps = 0;
+                UPGRADES.forEach(u => state.upgrades[u.id] = 0);
+                updateUI();
+                saveGame();
+            }
+        }
+
+        function exportSave() {
+            const data = buildSaveData();
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'jarvis-clicker-save.json';
+            a.click();
+        }
+
+        function importSave(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    state.cookies = data.cookies || 0;
+                    state.totalCookies = data.totalCookies || 0;
+                    state.clickPower = data.clickPower || 1;
+                    state.cps = data.cps || 0;
+                    if (data.upgrades) UPGRADES.forEach(u => { state.upgrades[u.id] = data.upgrades[u.id] || 0; });
+                    if (data.theme) { themeState = data.theme; applyTheme(themeState); }
+                    if (data.achievements) { unlockedAchievements = new Set(data.achievements); renderAchievements(); saveAchievements(); }
+                    updateUI();
+                    saveGame();
+                    checkAchievements();
+                    alert('✅ Partie importée !');
+                } catch(err) {
+                    alert('❌ Fichier invalide');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // ==================== GAME LOOP ====================
+        function gameLoop() {
+            if (state.cps > 0) {
+                state.cookies += state.cps / 10;
+                state.totalCookies += state.cps / 10;
+                updateUI();
+                saveGame();
+            }
+        }
+
+        // ==================== INIT ====================
+        loadGame();
+        updateUI();
         document.getElementById('cookie').addEventListener('click', clickCookie);
         setInterval(gameLoop, 100);
+        // Check achievements on load
+        setTimeout(checkAchievements, 500);
     </script>
 </body>
 </html>
